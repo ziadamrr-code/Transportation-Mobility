@@ -4,8 +4,6 @@
 
 ![Power BI](https://img.shields.io/badge/Power%20BI-Dashboard-F2C811?logo=powerbi&logoColor=black)
 ![SQL Server](https://img.shields.io/badge/SQL%20Server-T--SQL-CC2927?logo=microsoftsqlserver&logoColor=white)
-![DAX](https://img.shields.io/badge/DAX-Measures-742774)
-![Chart.js](https://img.shields.io/badge/Prototype-Chart.js-FF6384?logo=chartdotjs&logoColor=white)
 
 ---
 
@@ -17,12 +15,11 @@
 4. [Data Model](#-data-model)
 5. [Methodology & Assumptions](#-methodology--assumptions)
 6. [Dashboard Overview](#-dashboard-overview)
-7. [Interactive Prototype](#-interactive-prototype)
-8. [Key Insights](#-key-insights)
-9. [Recommendations](#-recommendations)
-10. [Repository Structure](#-repository-structure)
-11. [How to Reproduce](#-how-to-reproduce)
-12. [Author](#-author)
+7. [Key Insights](#-key-insights)
+8. [Recommendations](#-recommendations)
+9. [Repository Structure](#-repository-structure)
+10. [How to Reproduce](#-how-to-reproduce)
+11. [Author](#-author)
 
 ---
 
@@ -57,17 +54,16 @@ The dashboard answers the 8 primary questions of the challenge:
 
 | Layer | Tool | Purpose |
 |-------|------|---------|
-| Data preparation | **SQL Server (T-SQL)** | Targets database, data loading and preparation |
+| Data preparation | **SQL Server (T-SQL)** | Targets database, data exploration and queries (SELECT, JOIN) |
 | Modeling | **Power BI** (Import mode) | Star-schema relationships |
 | Calculations | **DAX** | KPIs, ratios, target comparisons |
 | Visualization | **Power BI Desktop** | Interactive 3-page report |
-| Prototype | **HTML + Chart.js** | Interactive mockup used to design the dashboard |
 
 ---
 
 ## 🗂 Data Model
 
-The Power BI model (`trips_db`, Import mode) follows a **star schema**:
+The Power BI model follows a **star schema**:
 
 **Fact tables**
 - `fact_trips`: trip-level data (fare, distance, passenger type, ratings)
@@ -93,14 +89,15 @@ Covered cities (IDs): `AP01, CH01, GJ01, GJ02, KA01, KL01, MP01, RJ01, TN01, UP0
 
 ## ⚙️ Methodology & Assumptions
 
-1. **Targets database**: the original MySQL 8.0.33 dump (`targets_db.sql`) was converted to **T-SQL** (`targets_db_sqlserver.sql`): `IF DB_ID(...) IS NULL CREATE DATABASE`, `GO` batch separators, `dbo` schema, named primary-key constraints, bracketed `[month]`, and removal of MySQL-specific syntax (backticks, `ENGINE`, `LOCK TABLES`, etc.).
-2. **Modeling**: tables imported into Power BI, related through `city_id` and the date/month dimensions.
-3. **DAX measures** (full list in [`powerbi/dax/measures.dax`](powerbi/dax/measures.dax)):
+1. **SQL layer**: explored and queried the data with T-SQL (see the `sql/` folder).
+2. **Targets database**: the original MySQL dump of `targets_db` was converted to T-SQL: `IF DB_ID(...) IS NULL CREATE DATABASE`, `GO` batch separators, `dbo` schema, named primary-key constraints, bracketed `[month]`, and removal of MySQL-specific syntax (backticks, `ENGINE`, `LOCK TABLES`, etc.).
+3. **Modeling**: tables imported into Power BI and related through `city_id` and the date/month dimensions.
+4. **DAX measures** built for the report:
    - *Core:* Total Trips, Total Fare, Avg Fare per Trip, Avg Fare per Km, Avg Trip Distance
    - *Passengers:* Total Passengers, New Passengers, Repeat Passengers, Repeat Passenger Rate %
    - *Targets:* Trips Target, Trips Achievement %, Trips Diff %, Trips On Target %
    - *Demand (Q4):* Peak Trips, Low Trips, Trip Range
-4. **Design**: 3 pages (1280×720), max 5 KPI cards per page, no tables, consistent purple palette, and global slicers for City type, City, Month, Day type and Passenger type.
+5. **Design**: 3 pages, max 5 KPI cards per page, consistent purple palette, and global slicers for City type, City, Month, Day type and Passenger type.
 
 **Assumptions made**
 - **City type** (Tourism vs. Business) is *not* in the source data. It was assigned as an assumption: **Jaipur, Kochi, Mysore, Visakhapatnam = Tourism**; all others = Business.
@@ -125,14 +122,6 @@ Covered cities (IDs): `AP01, CH01, GJ01, GJ02, KA01, KL01, MP01, RJ01, TN01, UP0
 ![Target Performance](images/page3_target_performance.png)
 
 **KPIs:** Trips Achievement **99.28%** · Avg Passenger Rating **7.66** · Repeat Passenger Rate **25.73%** · Trips On Target **51.67%**
-
----
-
-## 🧪 Interactive Prototype
-
-Before building in Power BI, the layout was designed as an interactive HTML mockup: [`prototype/goodcabs_dashboard_v2.html`](prototype/goodcabs_dashboard_v2.html).
-
-> ⚠️ The prototype uses **generated sample data** for layout and interaction design. Its numbers are **not** the real results; refer to the Power BI dashboard for actual figures.
 
 ---
 
@@ -168,23 +157,18 @@ Before building in Power BI, the layout was designed as an interactive HTML mock
 ## 📁 Repository Structure
 
 ```
-goodcabs-analytics/
+Transportation-Mobility/
 ├── README.md
-├── .gitignore
 ├── sql/
-│   └── targets_db_sqlserver.sql
+│   ├── Transportation & Mobility.sql    # exploration queries (SELECT / JOIN)
+│   └── targets_db.sql                   # targets database
 ├── powerbi/
-│   ├── Goodcabs.pbix
-│   └── dax/
-│       └── measures.dax
-├── prototype/
-│   └── goodcabs_dashboard_v2.html
-└── docs/
-    ├── primary_and_secondary_questions.pdf
-    └── images/   (dashboard screenshots)
+│   └── Goodcabs.pbit                    # Power BI template (no data)
+└── images/
+    ├── page1_operations_revenue.png
+    ├── page2_passengers_loyalty.png
+    └── page3_target_performance.png
 ```
-
-> The `images/` paths used above in this README should point to `docs/images/` if you keep that structure.
 
 ---
 
@@ -192,19 +176,18 @@ goodcabs-analytics/
 
 1. **Clone** the repository:
    ```bash
-   git clone https://github.com/<your-username>/goodcabs-analytics.git
+   git clone https://github.com/ziadamrr-code/Transportation-Mobility.git
    ```
-2. In **SQL Server (SSMS)**, run `sql/targets_db_sqlserver.sql` to create `targets_db` and its 3 target tables.
-3. Download the trips and passenger datasets from the [challenge page](https://codebasics.io/challenges/codebasics-resume-project-challenge/16) and load them into `trips_db`.
-4. Open `powerbi/Goodcabs.pbix` in **Power BI Desktop**, update the SQL Server connection to your own server, and click **Refresh**.
-5. Open `prototype/goodcabs_dashboard_v2.html` in any browser to view the interactive mockup.
+2. In **SQL Server (SSMS)**, run `sql/targets_db.sql` to create `targets_db` and its 3 target tables.
+3. Download the trips and passenger datasets from the [challenge page](https://codebasics.io/challenges/codebasics-resume-project-challenge/16) and load them into your own database.
+4. Open `powerbi/Goodcabs.pbit` in **Power BI Desktop**, enter your SQL Server connection details when prompted, and click **Refresh**.
 
 ---
 
 ## 👤 Author
 
 **Ziad Amr Saad Abdelfadel**
-📧 `zeka12352@gmail.com` · 🔗 [LinkedIn](www.linkedin.com/in/ziadamrr)
+💻 [GitHub](https://github.com/ziadamrr-code) · 🔗 [LinkedIn](www.linkedin.com/in/ziadamrr)
 
 ---
 
